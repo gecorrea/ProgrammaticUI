@@ -74,17 +74,79 @@ class YellowView: UIView {
 class ViewController: UIViewController {
     
     var myView = YellowView(frame: CGRect(x: 20, y: 35, width: 130, height: 50))
+    var myImage = UIImageView(frame: CGRect(x: 40, y: 150, width: 100, height: 100))
     
     override func viewDidLoad() {
         super.viewDidLoad()
         // Do any additional setup after loading the view, typically from a nib.
         
+        let myLabel = UILabel(frame: CGRect(x: 5, y: 5, width: 100, height: 15))
+        myLabel.text = "TurnToTech"
+        myView.addSubview(myLabel)
+        
         self.view.addSubview(myView)
+        self.createSegmentedController()
+        self.createImageView()
+        self.createButton()
+        self.createTextView()
     }
     
     override func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()
         // Dispose of any resources that can be recreated.
+    }
+    
+    func createSegmentedController() {
+        let segmentedController = UISegmentedControl(frame: CGRect(x: 50, y: 350, width: 130, height: 30))
+        segmentedController.backgroundColor = .white
+        segmentedController.insertSegment(withTitle: "iOS", at: 0, animated: true)
+        segmentedController.insertSegment(withTitle: "Android", at: 1, animated: true)
+        segmentedController.addTarget(self, action: #selector(segmentSelected), for: UIControlEvents.valueChanged)
+        self.view.addSubview(segmentedController)
+    }
+    
+    func segmentSelected(sender:UISegmentedControl) {
+        if sender.selectedSegmentIndex == 0 {
+            myView.backgroundColor = .blue
+        }
+        else {
+            myView.backgroundColor = .red
+        }
+    }
+    
+    func panImage(sender:UIPanGestureRecognizer) {
+        sender.view?.center = sender.location(in: sender.view?.superview)
+    }
+    
+    func createImageView() {
+        myImage.image = UIImage(named: "turntotech")
+        let panGesture = UIPanGestureRecognizer(target: self, action: #selector(panImage))
+        myImage.addGestureRecognizer(panGesture)
+        myImage.isUserInteractionEnabled = true
+        self.view.insertSubview(myImage, at: 0)
+    }
+    
+    func createButton() {
+        let myButton = UIButton(frame: CGRect(x: 175, y: 35, width: 70, height: 30))
+        myButton.setTitle("Rotate", for: UIControlState.normal)
+        myButton.backgroundColor = .blue
+        myButton.addTarget(self, action: #selector(buttonTapped), for: UIControlEvents.touchUpInside)
+        self.view.addSubview(myButton)
+    }
+    
+    func buttonTapped(sender:Any) {
+        UIView.animate(withDuration: 0.25, animations: {
+        self.myImage.transform = self.myImage.transform.rotated(by: CGFloat(Double.pi/2))
+        })
+    }
+    
+    func createTextView() {
+        let myTextView = UITextView(frame: CGRect(x: 0, y: self.view.bounds.size.height - (self.view.bounds.size.height/4), width: self.view.bounds.size.width, height: self.view.bounds.size.height/4))
+        myTextView.backgroundColor = .red
+        for _ in 0..<50 {
+            myTextView.text = myTextView.text.appending("The quick brown fox jumps upon a lazy dog.\n")
+        }
+        self.view.addSubview(myTextView)
     }
     
     
