@@ -77,6 +77,9 @@ class ViewController: UIViewController {
     var hero = UIImageView(frame: CGRect(x: 5, y: 40, width: 100, height: 100))
     var villain = UIImageView(frame: CGRect(x: 150, y: 40, width: 100, height: 100))
     
+    var heroes = ["black_widow", "hulk", "iron_man", "ms_marvel", "star_lord", "thor", "wolverine"]
+    var villains = ["apocalypse", "carnage", "doctor_doom", "juggernaut", "loki", "magneto", "thanos"]
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         // Do any additional setup after loading the view, typically from a nib.
@@ -117,8 +120,6 @@ class ViewController: UIViewController {
 //    }
     
     func createImageView() {
-        var heroes = ["black_widow", "hulk", "iron_man", "ms_marvel", "star_lord", "thor", "wolverine"]
-        var villains = ["apocalypse", "carnage", "doctor_doom", "juggernaut", "loki", "magneto", "thanos"]
         hero.image = UIImage(named: heroes[0])
         villain.image = UIImage(named: villains[0])
         let panGesture = UIPanGestureRecognizer(target: self, action: #selector(panImage))
