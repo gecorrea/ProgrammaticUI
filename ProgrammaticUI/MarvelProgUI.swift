@@ -71,7 +71,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 //    }
 //}
 
-class ViewController: UIViewController {
+class ViewController: UIViewController, UIGestureRecognizerDelegate {
     
 //    var myView = BackgroundView(frame: CGRect(x: 0, y: 0, width: , height: 50))
     lazy var backgroundImage : UIImageView = { return UIImageView(frame: CGRect(x: 0, y: 0, width: self.view.bounds.width, height: self.view.bounds.height)) }()
@@ -86,20 +86,15 @@ class ViewController: UIViewController {
     var heroes = ["black_widow", "hulk", "iron_man", "ms_marvel", "star_lord", "thor", "wolverine"]
     var villains = ["apocalypse", "carnage", "doctor_doom", "juggernaut", "loki", "magneto", "thanos"]
     
+    lazy var myView : UIView = { return UIView(frame: CGRect(x: self.view.bounds.size.width - (self.view.bounds.size.width/4), y: self.view.bounds.size.height - (self.view.bounds.size.height/4), width: self.view.bounds.size.width/4, height: self.view.bounds.size.height/4)) }()
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         // Do any additional setup after loading the view, typically from a nib.
         
-//        let myLabel = UILabel(frame: CGRect(x: 5, y: 5, width: 100, height: 15))
-//        myLabel.text = "TurnToTech"
-//        myView.addSubview(myLabel)
-        
-//        self.view.addSubview(myView)
-//        self.createSegmentedController()
-//        self.createButton()
-//        self.createTextView()
         self.createBackgroud()
         self.createImageView()
+        self.createView()
     }
     
     override func didReceiveMemoryWarning() {
@@ -107,27 +102,12 @@ class ViewController: UIViewController {
         // Dispose of any resources that can be recreated.
     }
     
-//    func createSegmentedController() {
-//        let segmentedController = UISegmentedControl(frame: CGRect(x: 50, y: 350, width: 130, height: 30))
-//        segmentedController.backgroundColor = .white
-//        segmentedController.insertSegment(withTitle: "iOS", at: 0, animated: true)
-//        segmentedController.insertSegment(withTitle: "Android", at: 1, animated: true)
-//        segmentedController.addTarget(self, action: #selector(segmentSelected), for: UIControlEvents.valueChanged)
-//        self.view.addSubview(segmentedController)
-//    }
-    
-//    func segmentSelected(sender:UISegmentedControl) {
-//        if sender.selectedSegmentIndex == 0 {
-//            myView.backgroundColor = .blue
-//        }
-//        else {
-//            myView.backgroundColor = .red
-//        }
-//    }
-    
     func createBackgroud() {
         backgroundImage.image = UIImage(named: backgrounds[backgroundIndex])
-        backgroundImage.clipsToBounds = true
+        backgroundImage.contentMode = .scaleAspectFill
+//        NotificationCenter.default.addObserver(self, selector: #selector(rotated), name: NSNotification.Name.UIDeviceOrientationDidChange, object: nil)
+        backgroundImage.autoresizingMask = UIViewAutoresizing.flexibleWidth
+        backgroundImage.autoresizingMask = UIViewAutoresizing.flexibleHeight
         let rightSwipeGesture = UISwipeGestureRecognizer(target: self, action: #selector(changeBackground))
         backgroundImage.addGestureRecognizer(rightSwipeGesture)
         let leftSwipeGesture = UISwipeGestureRecognizer(target: self, action: #selector(changeBackground))
@@ -137,10 +117,12 @@ class ViewController: UIViewController {
         self.view.addSubview(backgroundImage)
     }
     
+    
+    // allows you to change the background image by swiping the screen
     func changeBackground(sender:UISwipeGestureRecognizer) {
         if(sender.direction == UISwipeGestureRecognizerDirection.left) {
             if(backgroundIndex < backgrounds.count - 1) {
-                backgroundIndex = backgroundIndex + 1
+                backgroundIndex += 1
             }
             else {
                 backgroundIndex = 0
@@ -148,7 +130,7 @@ class ViewController: UIViewController {
         }
         else if(sender.direction == UISwipeGestureRecognizerDirection.right) {
             if(backgroundIndex > 0){
-                backgroundIndex = backgroundIndex - 1
+                backgroundIndex -= 1
             }
             else {
                 backgroundIndex = backgrounds.count - 1
@@ -157,97 +139,169 @@ class ViewController: UIViewController {
         backgroundImage.image = UIImage(named: backgrounds[backgroundIndex])
     }
     
+    // checks if the orientation of the screen has changed and resets characters if it has.
+//    func rotated() {
+//        
+//        print("\(self.view.bounds.size.width)")
+//        
+//        if UIDeviceOrientationIsLandscape(UIDevice.current.orientation) {
+//            backgroundImage.autoresizingMask = [.flexibleHeight, .flexibleWidth]
+//            print("Landscape")
+//             backgroundImage.contentMode = .scaleAspectFill
+//            
+//            hero.frame = CGRect(x: 5, y: 40, width: 100, height: 100)
+//            villain.frame = CGRect(x: 150, y: 40, width: 100, height: 100)
+//        }
+//        
+//        if UIDeviceOrientationIsPortrait(UIDevice.current.orientation) {
+//            backgroundImage.autoresizingMask = [.flexibleHeight, .flexibleWidth]
+//            print("Portrait")
+//             backgroundImage.contentMode = .scaleToFill
+//            
+//            hero.frame = CGRect(x: 5, y: 40, width: 100, height: 100)
+//            villain.frame = CGRect(x: 150, y: 40, width: 100, height: 100)
+//        }
+//    }
+    
     func createImageView() {
         hero.image = UIImage(named: heroes[heroIndex])
-        villain.image = UIImage(named: villains[villainIndex])
-        let tapGesture = UITapGestureRecognizer(target: self, action: #selector(changeHero))
-        let vTapGesture = UITapGestureRecognizer(target: self, action: #selector(changeVillain))
-        let panGesture = UIPanGestureRecognizer(target: self, action: #selector(panImage))
-        let vPanGesture = UIPanGestureRecognizer(target: self, action: #selector(panImage))
-        let pinchGesture = UIPinchGestureRecognizer(target: self, action: #selector(sizeImage))
-        let vPinchGesture = UIPinchGestureRecognizer(target: self, action: #selector(vSizeImage))
-        let rotateGesture = UIRotationGestureRecognizer(target: self, action: #selector(rotateHero))
-        let vRotateGesture = UIRotationGestureRecognizer(target: self, action: #selector(rotateVillain))
-        hero.addGestureRecognizer(panGesture)
-        hero.addGestureRecognizer(pinchGesture)
-        hero.addGestureRecognizer(tapGesture)
-        hero.addGestureRecognizer(rotateGesture)
-        villain.addGestureRecognizer(vPanGesture)
-        villain.addGestureRecognizer(vPinchGesture)
-        villain.addGestureRecognizer(vTapGesture)
-        villain.addGestureRecognizer(vRotateGesture)
+        let heroTapGesture = UITapGestureRecognizer(target: self, action: #selector(changeImage))
+        let heroTwoFinger = UITapGestureRecognizer(target: self, action: #selector(changeImage))
+        heroTwoFinger.numberOfTouchesRequired = 2
+        let heroDoubleTap = UITapGestureRecognizer(target: self, action: #selector(doubleTap))
+        heroDoubleTap.numberOfTapsRequired = 2
+        let heroLongPress = UILongPressGestureRecognizer(target: self, action: #selector(longPress))
+        let heroPanGesture = UIPanGestureRecognizer(target: self, action: #selector(panImage))
+        let heroPinchGesture = UIPinchGestureRecognizer(target: self, action: #selector(imageSize))
+        heroPinchGesture.delegate = self
+        let heroRotateGesture = UIRotationGestureRecognizer(target: self, action: #selector(rotateImage))
+        heroRotateGesture.delegate = self
+        hero.addGestureRecognizer(heroTapGesture)
+        hero.addGestureRecognizer(heroTwoFinger)
+        hero.addGestureRecognizer(heroDoubleTap)
+        hero.addGestureRecognizer(heroLongPress)
+        hero.addGestureRecognizer(heroPanGesture)
+        hero.addGestureRecognizer(heroPinchGesture)
+        hero.addGestureRecognizer(heroRotateGesture)
         hero.isUserInteractionEnabled = true
         hero.isMultipleTouchEnabled = true
+        hero.contentMode = .scaleAspectFit
+        self.view.addSubview(hero)
+        
+        
+        villain.image = UIImage(named: villains[villainIndex])
+        let villainTapGesture = UITapGestureRecognizer(target: self, action: #selector(changeImage))
+        let villainTwoFinger = UITapGestureRecognizer(target: self, action: #selector(changeImage))
+        villainTwoFinger.numberOfTouchesRequired = 2
+        let villainDoubleTap = UITapGestureRecognizer(target: self, action: #selector(doubleTap))
+        villainDoubleTap.numberOfTapsRequired = 2
+        let villainLongPress = UILongPressGestureRecognizer(target: self, action: #selector(longPress))
+        let villainPanGesture = UIPanGestureRecognizer(target: self, action: #selector(panImage))
+        let villainPinchGesture = UIPinchGestureRecognizer(target: self, action: #selector(imageSize))
+        villainPinchGesture.delegate = self
+        let villainRotateGesture = UIRotationGestureRecognizer(target: self, action: #selector(rotateImage))
+        villainRotateGesture.delegate = self
+        villain.addGestureRecognizer(villainTapGesture)
+        villain.addGestureRecognizer(villainTwoFinger)
+        villain.addGestureRecognizer(villainDoubleTap)
+        villain.addGestureRecognizer(villainLongPress)
+        villain.addGestureRecognizer(villainPanGesture)
+        villain.addGestureRecognizer(villainPinchGesture)
+        villain.addGestureRecognizer(villainRotateGesture)
         villain.isUserInteractionEnabled = true
         villain.isMultipleTouchEnabled = true
-        hero.clipsToBounds = true
-        villain.clipsToBounds = true
-        self.view.addSubview(hero)
+        villain.contentMode = .scaleAspectFit
         self.view.addSubview(villain)
     }
     
+    // allows you to change the character by tapping or two-finger tapping
+    func changeImage(sender:UITapGestureRecognizer) {
+        if sender.view == hero {
+            if (sender.numberOfTouches == 1) {
+                if (heroIndex < heroes.count - 1) {
+                    heroIndex = heroIndex + 1
+                }
+                else {
+                    heroIndex = 0
+                }
+            }
+            else if (sender.numberOfTouches == 2) {
+                if (heroIndex > 0) {
+                    heroIndex -= 1
+                }
+                else {
+                    heroIndex = heroes.count - 1
+                }
+            }
+            hero.image = UIImage(named: heroes[heroIndex])
+        }
+        else if sender.view == villain {
+            if (sender.numberOfTouches == 1) {
+                if (villainIndex < villains.count - 1) {
+                    villainIndex = villainIndex + 1
+                }
+                else {
+                    villainIndex = 0
+                }
+            }
+            else if (sender.numberOfTouches == 2) {
+                if(villainIndex > 0){
+                    villainIndex = villainIndex - 1
+                }
+                else {
+                    villainIndex = villains.count - 1
+                }
+            }
+            villain.image = UIImage(named: villains[villainIndex])
+        }
+        
+    }
+    
+    // take you back to first character in character array
+    func doubleTap(sender:UITapGestureRecognizer) {
+        if sender.view == hero {
+            heroIndex = 0
+            hero.image = UIImage(named: heroes[heroIndex])
+        }
+        else if sender.view == villain {
+            villainIndex = 0
+            villain.image = UIImage(named: villains[villainIndex])
+        }
+    }
+    
+    // rotates the character by press holding on them
+    func longPress(sender:UILongPressGestureRecognizer) {
+        if sender.view == hero {
+            UIView.animate(withDuration: 1, animations: {
+                self.hero.transform = self.hero.transform.rotated(by: CGFloat(Double.pi/2))
+            })
+        }
+        else if sender.view == villain {
+            UIView.animate(withDuration: 1, animations: {
+                self.villain.transform = self.villain.transform.rotated(by: CGFloat(Double.pi/2))
+            })
+        }
+    }
+    
+    // allows you to move characters around on the screen
     func panImage(sender:UIPanGestureRecognizer) {
         sender.view?.center = sender.location(in: sender.view?.superview)
     }
     
-    func sizeImage(sender:UIPinchGestureRecognizer) {
-        hero.transform = hero.transform.scaledBy(x: sender.scale , y: sender.scale)
+    // allows you to resize the characters
+    func imageSize(sender:UIPinchGestureRecognizer) {
+        sender.view?.transform = (sender.view?.transform.scaledBy(x: sender.scale, y: sender.scale))!
         sender.scale = 1.0
     }
     
-    func vSizeImage(sender:UIPinchGestureRecognizer) {
-        villain.transform = villain.transform.scaledBy(x: sender.scale , y: sender.scale)
-        sender.scale = 1.0
+    // allows the user to rotate the character
+    func rotateImage(sender:UIRotationGestureRecognizer) {
+        sender.view?.transform = (sender.view?.transform.rotated(by: sender.rotation))!
+        sender.rotation = 0
     }
     
-    func changeHero(sender:UITapGestureRecognizer) {
-        if (sender.numberOfTouches == 1) {
-            if (heroIndex < heroes.count - 1) {
-                heroIndex = heroIndex + 1
-            }
-            else {
-                heroIndex = 0
-            }
-        }
-//        else if (sender. == 2) {
-//            if(heroIndex > 0){
-//                heroIndex = heroIndex - 1
-//            }
-//            else {
-//                heroIndex = heroes.count - 1
-//            }
-//        }
-        hero.image = UIImage(named: heroes[heroIndex])
-    }
-    
-    func changeVillain(sender:UITapGestureRecognizer) {
-        if (sender.numberOfTouches == 1) {
-            if (villainIndex < villains.count - 1) {
-                villainIndex = villainIndex + 1
-            }
-            else {
-                villainIndex = 0
-            }
-        }
-        villain.image = UIImage(named: villains[villainIndex])
-    }
-    
-    func rotateHero(sender:UIRotationGestureRecognizer) {
-        if (sender.velocity > 0) {
-            hero.transform = hero.transform.rotated(by: sender.rotation)
-        }
-        else {
-            hero.transform = hero.transform.rotated(by: sender.rotation)
-        }
-    }
-    
-    func rotateVillain(sender:UIRotationGestureRecognizer) {
-        if (sender.velocity > 0) {
-            villain.transform = villain.transform.rotated(by: sender.rotation)
-        }
-        else {
-            villain.transform = villain.transform.rotated(by: sender.rotation)
-        }
+    func gestureRecognizer(_ gestureRecognizer: UIGestureRecognizer, shouldRecognizeSimultaneouslyWith otherGestureRecognizer: UIGestureRecognizer) -> Bool {
+        return true
     }
     
 //    func createButton() {
@@ -264,12 +318,29 @@ class ViewController: UIViewController {
 //        })
 //    }
     
-//    func createTextView() {
-//        let myTextView = UITextView(frame: CGRect(x: 0, y: self.view.bounds.size.height - (self.view.bounds.size.height/4), width: self.view.bounds.size.width, height: self.view.bounds.size.height/4))
-//        myTextView.backgroundColor = .red
-//        for _ in 0..<50 {
-//            myTextView.text = myTextView.text.appending("The quick brown fox jumps upon a lazy dog.\n")
-//        }
-//        self.view.addSubview(myTextView)
-//    }
+    func createView() {
+//        let myView = UIView(frame: CGRect(x: self.view.bounds.size.width - (self.view.bounds.size.width/4), y: self.view.bounds.size.height - (self.view.bounds.size.height/4), width: self.view.bounds.size.width/4, height: self.view.bounds.size.height/4))
+        myView.backgroundColor = .yellow
+        self.view.addSubview(myView)
+    }
+    
+    
+    override func viewWillTransition(to size: CGSize, with coordinator: UIViewControllerTransitionCoordinator) {
+        if (UIDevice.current.orientation.isLandscape ){
+            print("Landscape")
+            backgroundImage.autoresizingMask = [.flexibleHeight, .flexibleWidth]
+            backgroundImage.contentMode = .scaleAspectFill
+            hero.frame = CGRect(x: 5, y: 40, width: 100, height: 100)
+            villain.frame = CGRect(x: 150, y: 40, width: 100, height: 100)
+            myView.frame = CGRect(x: self.view.bounds.size.width - (self.view.bounds.size.width/4), y: self.view.bounds.size.height - (self.view.bounds.size.height/4), width: self.view.bounds.size.width/4, height: self.view.bounds.size.height/4)
+        } else {
+            print("Portrait")
+            backgroundImage.autoresizingMask = [.flexibleHeight, .flexibleWidth]
+            backgroundImage.contentMode = .scaleToFill
+            hero.frame = CGRect(x: 5, y: 40, width: 100, height: 100)
+            villain.frame = CGRect(x: 150, y: 40, width: 100, height: 100)
+            myView.frame = CGRect(x: self.view.bounds.size.width - (self.view.bounds.size.width/4), y: self.view.bounds.size.height - (self.view.bounds.size.height/4), width: self.view.bounds.size.width/4, height: self.view.bounds.size.height/4)
+        }
+    }
+    
 }
