@@ -75,12 +75,16 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate {
     
 //    var myView = BackgroundView(frame: CGRect(x: 0, y: 0, width: , height: 50))
     lazy var backgroundImage : UIImageView = { return UIImageView(frame: CGRect(x: 0, y: 0, width: self.view.bounds.width, height: self.view.bounds.height)) }()
-    var hero = UIImageView(frame: CGRect(x: 5, y: 40, width: 100, height: 100))
+    var hero = UIImageView(frame: CGRect(x: 5, y: 100, width: 100, height: 100))
     var heroIndex:Int = 0
-    var villain = UIImageView(frame: CGRect(x: 150, y: 40, width: 100, height: 100))
+    var villain = UIImageView(frame: CGRect(x: 150, y: 100, width: 100, height: 100))
     var villainIndex:Int = 0
     var backgrounds = ["age_of_ultron", "avengers_tower", "manthing", "secret_wars", "xmansion"]
     var backgroundIndex:Int = 0
+    let textField1 = UITextField(frame: CGRect(x: 5, y: 50, width: 50, height: 25))
+    let textField2 = UITextField(frame: CGRect(x: 95, y: 50, width: 50, height: 25))
+    var sumLabel = UILabel(frame: CGRect(x: 180, y: 50, width: 50, height: 25))
+    
     
     var heroes = ["black_widow", "hulk", "iron_man", "ms_marvel", "star_lord", "thor", "wolverine"]
     var villains = ["apocalypse", "carnage", "doctor_doom", "juggernaut", "loki", "magneto", "thanos"]
@@ -93,6 +97,8 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate {
         self.createBackgroud()
         self.createImageView()
         self.createView()
+        self.createTextFieldsAndLabels()
+        self.createButton()
     }
     
     override func didReceiveMemoryWarning() {
@@ -144,8 +150,8 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate {
             villain.gestureRecognizers?.forEach(villain.removeGestureRecognizer)
             self.hero.removeFromSuperview()
             self.villain.removeFromSuperview()
-            hero = UIImageView(frame: CGRect(x: 5, y: 40, width: 100, height: 100))
-            villain = UIImageView(frame: CGRect(x: 150, y: 40, width: 100, height: 100))
+            hero = UIImageView(frame: CGRect(x: 5, y: 100, width: 100, height: 100))
+            villain = UIImageView(frame: CGRect(x: 150, y: 100, width: 100, height: 100))
             createImageView()
             myView.frame = CGRect(x: self.view.bounds.size.width - (self.view.frame.size.width/4), y: self.view.frame.size.height - (self.view.frame.size.height/4), width: self.view.frame.size.width/4, height: self.view.frame.size.height/4)
         }
@@ -158,8 +164,8 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate {
             villain.gestureRecognizers?.forEach(villain.removeGestureRecognizer)
             self.hero.removeFromSuperview()
             self.villain.removeFromSuperview()
-            hero = UIImageView(frame: CGRect(x: 5, y: 40, width: 100, height: 100))
-            villain = UIImageView(frame: CGRect(x: 150, y: 40, width: 100, height: 100))
+            hero = UIImageView(frame: CGRect(x: 5, y: 100, width: 100, height: 100))
+            villain = UIImageView(frame: CGRect(x: 150, y: 100, width: 100, height: 100))
             createImageView()
             myView.frame = CGRect(x: self.view.bounds.size.width - (self.view.frame.size.width/4), y: self.view.frame.size.height - (self.view.frame.size.height/4), width: self.view.frame.size.width/4, height: self.view.frame.size.height/4)
         }
@@ -306,19 +312,50 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate {
         return true
     }
     
-//    func createButton() {
-//        let myButton = UIButton(frame: CGRect(x: 175, y: 35, width: 70, height: 30))
-//        myButton.setTitle("Rotate", for: UIControlState.normal)
-//        myButton.backgroundColor = .blue
-//        myButton.addTarget(self, action: #selector(buttonTapped), for: UIControlEvents.touchUpInside)
-//        self.view.addSubview(myButton)
-//    }
+    // create text fields and labels
+    func createTextFieldsAndLabels () {
+        textField1.placeholder = "x"
+        textField1.keyboardType = UIKeyboardType.numberPad
+        textField1.font = UIFont.systemFont(ofSize: 15)
+        textField1.borderStyle = UITextBorderStyle.roundedRect
+        textField1.autocorrectionType = UITextAutocorrectionType.no
+        
+        textField2.placeholder = "y"
+        textField2.keyboardType = UIKeyboardType.numberPad
+        textField2.font = UIFont.systemFont(ofSize: 15)
+        textField2.borderStyle = UITextBorderStyle.roundedRect
+        textField2.autocorrectionType = UITextAutocorrectionType.no
+        
+        self.view.addSubview(textField1)
+        self.view.addSubview(textField2)
+        
+        let plusLabel = UILabel(frame: CGRect(x: 70, y: 50, width: 15, height: 25))
+        plusLabel.text = "+"
+        plusLabel.textColor = .red
+        self.view.addSubview(plusLabel)
+        
+        let equalLabel = UILabel(frame: CGRect(x: 160, y: 50, width: 15, height: 25))
+        equalLabel.text = "="
+        equalLabel.textColor = .red
+        self.view.addSubview(equalLabel)
+    }
     
-//    func buttonTapped(sender:Any) {
-//        UIView.animate(withDuration: 0.25, animations: {
-//            self.myImage.transform = self.myImage.transform.rotated(by: CGFloat(Double.pi/2))
-//        })
-//    }
+    // create button that adds the two values in the text fields
+    func createButton() {
+        let myButton = UIButton(frame: CGRect(x: 250, y: 50, width: 70, height: 30))
+        myButton.setTitle("Sum", for: UIControlState.normal)
+        myButton.backgroundColor = .blue
+        myButton.addTarget(self, action: #selector(buttonTapped), for: UIControlEvents.touchUpInside)
+        self.view.addSubview(myButton)
+    }
+    
+    func buttonTapped(sender:Any) {
+        let number1 = Int(textField1.text!)
+        let number2 = Int(textField2.text!)
+        sumLabel.textColor = .red
+        sumLabel.text = String(number1! + number2!)
+        self.view.addSubview(sumLabel)
+    }
     
     func createView() {
         myView.backgroundColor = .yellow
