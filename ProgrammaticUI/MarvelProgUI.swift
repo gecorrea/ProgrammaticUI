@@ -81,7 +81,6 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate {
     var villainIndex:Int = 0
     var backgrounds = ["age_of_ultron", "avengers_tower", "manthing", "secret_wars", "xmansion"]
     var backgroundIndex:Int = 0
-
     
     var heroes = ["black_widow", "hulk", "iron_man", "ms_marvel", "star_lord", "thor", "wolverine"]
     var villains = ["apocalypse", "carnage", "doctor_doom", "juggernaut", "loki", "magneto", "thanos"]
@@ -91,7 +90,6 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate {
     override func viewDidLoad() {
         super.viewDidLoad()
         // Do any additional setup after loading the view, typically from a nib.
-        
         self.createBackgroud()
         self.createImageView()
         self.createView()
@@ -104,10 +102,8 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate {
     
     func createBackgroud() {
         backgroundImage.image = UIImage(named: backgrounds[backgroundIndex])
-        backgroundImage.contentMode = .scaleAspectFill
-//        NotificationCenter.default.addObserver(self, selector: #selector(rotated), name: NSNotification.Name.UIDeviceOrientationDidChange, object: nil)
-        backgroundImage.autoresizingMask = UIViewAutoresizing.flexibleWidth
-        backgroundImage.autoresizingMask = UIViewAutoresizing.flexibleHeight
+        backgroundImage.contentMode = .scaleToFill
+        NotificationCenter.default.addObserver(self, selector: #selector(rotated), name: NSNotification.Name.UIApplicationDidChangeStatusBarOrientation, object: nil)
         let rightSwipeGesture = UISwipeGestureRecognizer(target: self, action: #selector(changeBackground))
         backgroundImage.addGestureRecognizer(rightSwipeGesture)
         let leftSwipeGesture = UISwipeGestureRecognizer(target: self, action: #selector(changeBackground))
@@ -140,28 +136,34 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate {
     }
     
     // checks if the orientation of the screen has changed and resets characters if it has.
-//    func rotated() {
-//        
-//        print("\(self.view.bounds.size.width)")
-//        
-//        if UIDeviceOrientationIsLandscape(UIDevice.current.orientation) {
-//            backgroundImage.autoresizingMask = [.flexibleHeight, .flexibleWidth]
-//            print("Landscape")
-//             backgroundImage.contentMode = .scaleAspectFill
-//            
-//            hero.frame = CGRect(x: 5, y: 40, width: 100, height: 100)
-//            villain.frame = CGRect(x: 150, y: 40, width: 100, height: 100)
-//        }
-//        
-//        if UIDeviceOrientationIsPortrait(UIDevice.current.orientation) {
-//            backgroundImage.autoresizingMask = [.flexibleHeight, .flexibleWidth]
-//            print("Portrait")
-//             backgroundImage.contentMode = .scaleToFill
-//            
-//            hero.frame = CGRect(x: 5, y: 40, width: 100, height: 100)
-//            villain.frame = CGRect(x: 150, y: 40, width: 100, height: 100)
-//        }
-//    }
+    func rotated() {
+        if UIDeviceOrientationIsLandscape(UIDevice.current.orientation) {
+            self.backgroundImage.frame = self.view.frame
+            backgroundImage.contentMode = .scaleToFill
+            hero.gestureRecognizers?.forEach(hero.removeGestureRecognizer)
+            villain.gestureRecognizers?.forEach(villain.removeGestureRecognizer)
+            self.hero.removeFromSuperview()
+            self.villain.removeFromSuperview()
+            hero = UIImageView(frame: CGRect(x: 5, y: 40, width: 100, height: 100))
+            villain = UIImageView(frame: CGRect(x: 150, y: 40, width: 100, height: 100))
+            createImageView()
+            myView.frame = CGRect(x: self.view.bounds.size.width - (self.view.frame.size.width/4), y: self.view.frame.size.height - (self.view.frame.size.height/4), width: self.view.frame.size.width/4, height: self.view.frame.size.height/4)
+        }
+        
+        if UIDeviceOrientationIsPortrait(UIDevice.current.orientation) {
+            backgroundImage.autoresizingMask = [.flexibleHeight, .flexibleWidth]
+            self.backgroundImage.frame = self.view.frame
+            backgroundImage.contentMode = .scaleToFill
+            hero.gestureRecognizers?.forEach(hero.removeGestureRecognizer)
+            villain.gestureRecognizers?.forEach(villain.removeGestureRecognizer)
+            self.hero.removeFromSuperview()
+            self.villain.removeFromSuperview()
+            hero = UIImageView(frame: CGRect(x: 5, y: 40, width: 100, height: 100))
+            villain = UIImageView(frame: CGRect(x: 150, y: 40, width: 100, height: 100))
+            createImageView()
+            myView.frame = CGRect(x: self.view.bounds.size.width - (self.view.frame.size.width/4), y: self.view.frame.size.height - (self.view.frame.size.height/4), width: self.view.frame.size.width/4, height: self.view.frame.size.height/4)
+        }
+    }
     
     func createImageView() {
         hero.image = UIImage(named: heroes[heroIndex])
@@ -319,28 +321,7 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate {
 //    }
     
     func createView() {
-//        let myView = UIView(frame: CGRect(x: self.view.bounds.size.width - (self.view.bounds.size.width/4), y: self.view.bounds.size.height - (self.view.bounds.size.height/4), width: self.view.bounds.size.width/4, height: self.view.bounds.size.height/4))
         myView.backgroundColor = .yellow
         self.view.addSubview(myView)
     }
-    
-    
-    override func viewWillTransition(to size: CGSize, with coordinator: UIViewControllerTransitionCoordinator) {
-        if (UIDevice.current.orientation.isLandscape ){
-            print("Landscape")
-            backgroundImage.autoresizingMask = [.flexibleHeight, .flexibleWidth]
-            backgroundImage.contentMode = .scaleAspectFill
-            hero.frame = CGRect(x: 5, y: 40, width: 100, height: 100)
-            villain.frame = CGRect(x: 150, y: 40, width: 100, height: 100)
-            myView.frame = CGRect(x: self.view.bounds.size.width - (self.view.bounds.size.width/4), y: self.view.bounds.size.height - (self.view.bounds.size.height/4), width: self.view.bounds.size.width/4, height: self.view.bounds.size.height/4)
-        } else {
-            print("Portrait")
-            backgroundImage.autoresizingMask = [.flexibleHeight, .flexibleWidth]
-            backgroundImage.contentMode = .scaleToFill
-            hero.frame = CGRect(x: 5, y: 40, width: 100, height: 100)
-            villain.frame = CGRect(x: 150, y: 40, width: 100, height: 100)
-            myView.frame = CGRect(x: self.view.bounds.size.width - (self.view.bounds.size.width/4), y: self.view.bounds.size.height - (self.view.bounds.size.height/4), width: self.view.bounds.size.width/4, height: self.view.bounds.size.height/4)
-        }
-    }
-    
 }
